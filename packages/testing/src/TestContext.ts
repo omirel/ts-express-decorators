@@ -54,7 +54,7 @@ export class TestContext {
     }
 
     if (!injector.has(HttpsServer)) {
-      createHttpsServer(injector, {port: 8081});
+      createHttpsServer(injector);
     }
 
     if (!hasExpress) {
@@ -123,12 +123,11 @@ export class TestContext {
 
   static invoke(target: Type<any>, providers: {provide: any | symbol; use: any}[]): any | Promise<any> {
     const locals = new Map();
-
     providers.forEach(p => {
       locals.set(p.provide, p.use);
     });
 
-    const instance: any = TestContext.injector.invoke(target, locals);
+    const instance: any = TestContext.injector.invoke(target, locals, {rebuild: true});
 
     if (instance && instance.$onInit) {
       const result = instance.$onInit();

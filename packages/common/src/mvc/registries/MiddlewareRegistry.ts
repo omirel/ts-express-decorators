@@ -8,8 +8,7 @@ import {MiddlewareType} from "../interfaces/MiddlewareType";
  */
 // tslint:disable-next-line: variable-name
 export const MiddlewareRegistry: TypedProvidersRegistry = GlobalProviders.createRegistry(ProviderType.MIDDLEWARE, Provider, {
-  injectable: true,
-  buildable: true
+  injectable: true
 });
 
 const middlewareRegisterFn = GlobalProviders.createRegisterFn(ProviderType.MIDDLEWARE);

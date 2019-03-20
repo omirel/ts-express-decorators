@@ -1,3 +1,5 @@
+import {Container} from "@tsed/di";
+
 const express = require("express");
 
 /**
@@ -21,7 +23,7 @@ if (!express.request.setEndpoint) {
      *
      */
     createContainer() {
-      this._container = new Map();
+      this._container = new Container();
     },
     /**
      *
@@ -32,14 +34,8 @@ if (!express.request.setEndpoint) {
     /**
      *
      */
-    destroyContainer() {
-      this._container.forEach((instance: any) => {
-        /* istanbul ignore next */
-        if (instance.$onDestroy) {
-          instance.$onDestroy();
-        }
-      });
-
+    async destroyContainer() {
+      await (this._container as Container<any>).destroy();
       delete this._container;
     },
     /**
