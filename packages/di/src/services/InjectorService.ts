@@ -383,10 +383,33 @@ export class InjectorService extends ProviderContainer {
 
   /**
    *
-   * @param {string} eventName
-   * @param result
-   * @param {string} service
+   * @param instance
+   * @param propertyKey
+   * @param useType
+   * @param options
    */
+  public bindInterceptor(instance: any, {propertyKey, useType, options}: IInjectablePropertyService) {
+    const target = getClass(instance);
+    const originalMethod = instance[propertyKey];
+
+    instance[propertyKey] = (...args: any[]) => {
+      const context: IInterceptorContext<any> = {
+        target,
+        method: propertyKey,
+        propertyKey,
+        args,
+        proceed(err?: Error) {
+          if (!err) {
+            return originalMethod.apply(instance, args);
+          }
+
+          throw err;
+        }
+      };
+
+      return this.invoke<IInterceptor>(useType).aroundInvoke(context, options);
+    };
+  }
 
   /**
    *
