@@ -1,10 +1,10 @@
 import {InjectorService, ProviderScope} from "@tsed/common";
 import {bootstrap, inject, TestContext} from "@tsed/testing";
+import {expect} from "chai";
 import {ProductsCtrl} from "./app/controllers/products/ProductsCtrl";
+import {FakeServer} from "./app/FakeServer";
 import {InnerService} from "./app/services/InnerService";
 import {OuterService} from "./app/services/OuterService";
-import {FakeServer} from "./app/FakeServer";
-import {expect} from "chai";
 
 describe("DI", () => {
   before(async () => {
@@ -16,7 +16,7 @@ describe("DI", () => {
 
       this.rebuildHandler = provider.scope !== ProviderScope.SINGLETON;
 
-      this.instance = injector.invoke(target, this.locals, undefined, true);
+      this.instance = injector.invoke(target, this.locals, {useScope: true, rebuild: true});
     })();
   });
 

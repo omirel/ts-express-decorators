@@ -1,5 +1,7 @@
 export * from "./class/Provider";
 export * from "./class/ProviderStorable";
+export * from "./class/Container";
+export * from "./class/ProviderContainer";
 export * from "./interfaces";
 export * from "./decorators/scope";
 export * from "./decorators/service";
@@ -11,3 +13,4 @@ export * from "./decorators/constant";
 export * from "./decorators/value";
 export * from "./registries/ProviderRegistry";
 export * from "./services/InjectorService";
+export * from "./registries/GlobalProviders";

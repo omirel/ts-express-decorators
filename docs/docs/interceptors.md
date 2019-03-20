@@ -1,4 +1,4 @@
-# Interceptors  <Badge text="beta" type="warn"/> <Badge text="Contributors are welcome" />
+# Interceptors
 
 Creating and consuming an interceptor is two-step process.
 
@@ -12,10 +12,10 @@ Creating and consuming an interceptor is two-step process.
 ## Interceptor class
 
 To create interceptor class you need to implement he `IInterceptor` interface and implement the
-`aroundInvoke(ctx: IInterceptorContext)` method, and use the `@Interceptor()` annotaiton to register your interceptor class. Inside your `src/interceptors/MyInterceptor.ts` folder create the following simple interceptor.
+`aroundInvoke(ctx: IInterceptorContext)` method, and use the `@Interceptor()` annotation to register your interceptor class. Inside your `src/interceptors/MyInterceptor.ts` folder create the following simple interceptor.
 
 ```typescript
-import { IInterceptor, IInterceptorContext, Interceptor } from '@tsed/common';
+import { IInterceptor, IInterceptorContext, Interceptor, InjectorService } from '@tsed/common';
 
 @Interceptor()
 export class MyInterceptor implements IInterceptor {
@@ -26,11 +26,12 @@ export class MyInterceptor implements IInterceptor {
     }
 
     /**
-     * ctx: The context that holds the dynamic data related to the method executiong and the proceed method * to proceed with the original method execution 
+     * ctx: The context that holds the dynamic data related to the method execution and the proceed method 
+     * to proceed with the original method execution 
      * 
      * opts: Static params that can be provided when the interceptor is attached to a specific method 
      */
-    aroundInvoke(ctx: IInterceptorContext, opts?: any) {
+    aroundInvoke(ctx: IInterceptorContext<any>, opts?: any) {
         console.log(`the method ${ctx.method} will be executed with args ${ctx.args} and static data ${opts}`);
         // let the original method proceed
         const retValue = ctx.proceed();
