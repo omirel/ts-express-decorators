@@ -1,6 +1,6 @@
-import {getClass, NotEnumerable, Type} from "@tsed/core";
-import * as Express from "express";
+import {Enumerable, NotEnumerable, Type} from "@tsed/core";
 import {Provider} from "@tsed/di";
+import * as Express from "express";
 import {IRouterSettings} from "../../config/interfaces/IServerSettings";
 
 import {IControllerMiddlewares, IControllerOptions} from "../interfaces";
@@ -12,12 +12,13 @@ export interface IChildrenController extends Type<any> {
 }
 
 export class ControllerProvider extends Provider<any> implements IControllerOptions {
+  @NotEnumerable()
+  public router: Express.Router;
   /**
    * The path for the controller
    */
-  @NotEnumerable()
-  private _path: string;
-
+  @Enumerable()
+  public path: string;
   /**
    * Controllers that depend to this controller.
    * @type {Array}
@@ -26,9 +27,6 @@ export class ControllerProvider extends Provider<any> implements IControllerOpti
   @NotEnumerable()
   private _dependencies: IChildrenController[] = [];
 
-  @NotEnumerable()
-  public router: Express.Router;
-
   constructor(provide: any) {
     super(provide);
     this.type = "controller";
@@ -36,26 +34,10 @@ export class ControllerProvider extends Provider<any> implements IControllerOpti
 
   /**
    *
-   * @returns {string}
-   */
-  get path(): string {
-    return this._path;
-  }
-
-  /**
-   * set path
-   * @param value
-   */
-  set path(value: string) {
-    this._path = value;
-  }
-
-  /**
-   *
    * @returns {Endpoint[]}
    */
   get endpoints(): EndpointMetadata[] {
-    return EndpointRegistry.getEndpoints(getClass(this.provide));
+    return EndpointRegistry.getEndpoints(this.provide);
   }
 
   /**
@@ -70,6 +52,7 @@ export class ControllerProvider extends Provider<any> implements IControllerOpti
    *
    * @param dependencies
    */
+  @Enumerable()
   set dependencies(dependencies: IChildrenController[]) {
     this._dependencies = dependencies;
     this._dependencies.forEach(d => (d.$parentCtrl = this));
@@ -85,18 +68,18 @@ export class ControllerProvider extends Provider<any> implements IControllerOpti
 
   /**
    *
-   * @returns {ControllerProvider}
-   */
-  get parent() {
-    return this.provide.$parentCtrl;
-  }
-
-  /**
-   *
    * @param value
    */
   set routerOptions(value: IRouterSettings) {
     this.store.set("routerOptions", value);
+  }
+
+  /**
+   *
+   * @returns {ControllerProvider}
+   */
+  get parent() {
+    return this.provide.$parentCtrl;
   }
 
   /**
@@ -131,8 +114,9 @@ export class ControllerProvider extends Provider<any> implements IControllerOpti
   /**
    * Resolve final endpoint url.
    */
-  public getEndpointUrl = (routerPath: string): string =>
-    (routerPath === this.path ? this.path : (routerPath || "") + this.path).replace(/\/\//gi, "/");
+  public getEndpointUrl(routerPath: string): string {
+    return (routerPath === this.path ? this.path : (routerPath || "") + this.path).replace(/\/\//gi, "/");
+  }
 
   /**
    *
@@ -155,16 +139,5 @@ export class ControllerProvider extends Provider<any> implements IControllerOpti
    */
   public hasParent(): boolean {
     return !!this.provide.$parentCtrl;
-  }
-
-  clone(): ControllerProvider {
-    const provider = new ControllerProvider(this._provide);
-    provider._type = this._type;
-    provider.useClass = this._useClass;
-    provider._instance = this._instance;
-    provider._path = this._path;
-    provider._dependencies = this._dependencies;
-
-    return provider;
   }
 }
