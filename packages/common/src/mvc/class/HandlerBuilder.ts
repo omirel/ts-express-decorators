@@ -1,9 +1,10 @@
 import {nameOf} from "@tsed/core";
+import {InjectorService} from "@tsed/di";
 import * as Express from "express";
-import {ProviderScope, InjectorService} from "@tsed/di";
 import {FilterBuilder} from "../../filters/class/FilterBuilder";
 import {ParamMetadata} from "../../filters/class/ParamMetadata";
 import {IFilterPreHandler} from "../../filters/interfaces/IFilterPreHandler";
+import {HandlerType} from "../interfaces/HandlerType";
 import {EndpointMetadata} from "./EndpointMetadata";
 import {HandlerMetadata} from "./HandlerMetadata";
 
@@ -12,8 +13,6 @@ import {HandlerMetadata} from "./HandlerMetadata";
  */
 export class HandlerBuilder {
   private filters: any[];
-  private _handler: Function;
-  private _rebuildHandler: boolean = false;
   private injector: InjectorService;
   private debug: boolean;
 
@@ -53,50 +52,15 @@ export class HandlerBuilder {
 
   /**
    *
-   * @param locals
-   * @returns {any}
-   */
-  private buildHandler<T>(locals: Map<string | Function, any> = new Map<string | Function, any>()): Function {
-    const provider = this.injector.getProvider(this.handlerMetadata.target);
-
-    /* istanbul ignore next */
-    if (!provider) {
-      throw new Error(`${nameOf(this.handlerMetadata.target)} component not found in the injector`);
-    }
-
-    const target = provider.useClass;
-    let instance = provider.instance;
-
-    this._rebuildHandler = provider.scope !== ProviderScope.SINGLETON;
-
-    if (this._rebuildHandler || instance === undefined) {
-      instance = this.injector.invoke<T>(target, locals, undefined, true);
-      locals.set(this.handlerMetadata.target, instance);
-    }
-
-    return instance[this.handlerMetadata.methodClassName!].bind(instance);
-  }
-
-  /**
-   *
    */
   private getHandler(locals: Map<string | Function, any> = new Map<string | Function, any>()): Function {
-    if (!this._rebuildHandler && this._handler) {
-      return this._handler;
+    if (this.handlerMetadata.type === HandlerType.FUNC) {
+      return this.handlerMetadata.target;
     }
 
-    switch (this.handlerMetadata.type) {
-      default:
-      case "function":
-        this._handler = this.handlerMetadata.target;
-        break;
-      case "middleware":
-      case "controller":
-        this._handler = this.buildHandler(locals);
-        break;
-    }
+    const instance: any = this.injector.invoke(this.handlerMetadata.target, locals, {useScope: true});
 
-    return this._handler;
+    return instance[this.handlerMetadata.methodClassName!].bind(instance);
   }
 
   /**

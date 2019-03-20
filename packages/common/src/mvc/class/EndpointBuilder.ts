@@ -49,6 +49,7 @@ export class EndpointBuilder {
       request.destroyContainer();
       request.destroyEndpoint();
     } catch (error) {
+      /* istanbul ignore next */
       request.log.error({
         error: {
           message: "Unable to clean request. " + error.message,
