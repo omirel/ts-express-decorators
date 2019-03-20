@@ -1,16 +1,17 @@
 import {NotEnumerable, Store} from "@tsed/core";
-import {ProviderType, ProviderRegistry} from "@tsed/di";
+import {GlobalProviders, ProviderType} from "@tsed/di";
 import {ParamMetadata} from "../../filters/class/ParamMetadata";
 import {EXPRESS_ERR, EXPRESS_NEXT_FN, EXPRESS_REQUEST, EXPRESS_RESPONSE} from "../../filters/constants";
 import {ParamRegistry} from "../../filters/registries/ParamRegistry";
 import {MiddlewareType} from "../interfaces";
+import {HandlerType} from "../interfaces/HandlerType";
 
 export class HandlerMetadata {
   /**
    *
    */
   @NotEnumerable()
-  private _type: "function" | "middleware" | "controller" = "function";
+  private _type: HandlerType = HandlerType.FUNC;
   /**
    *
    * @type {boolean}
@@ -36,40 +37,6 @@ export class HandlerMetadata {
 
   constructor(private _target: any, private _methodClassName?: string) {
     this.resolve();
-  }
-
-  /**
-   *
-   */
-  private resolve() {
-    this._useClass = this._target;
-
-    let handler = this._target;
-    let target = this._target;
-
-    if (ProviderRegistry.has(this._target)) {
-      const provider = ProviderRegistry.get(this._target)!;
-      this._type = provider.type;
-
-      if (provider.type === ProviderType.MIDDLEWARE) {
-        this._type = "middleware";
-        this._errorParam = Store.from(provider.provide).get("middlewareType") === MiddlewareType.ERROR;
-        this._methodClassName = "use";
-        this._useClass = target = provider.useClass;
-      }
-    }
-
-    if (this._methodClassName) {
-      this._injectable = ParamRegistry.isInjectable(target, this._methodClassName);
-      this._nextFunction = ParamRegistry.hasNextFunction(target, this._methodClassName);
-
-      handler = target.prototype[this._methodClassName];
-    }
-
-    if (!this._injectable) {
-      this._errorParam = handler.length === 4;
-      this._nextFunction = handler.length >= 3;
-    }
   }
 
   get type() {
@@ -112,5 +79,39 @@ export class HandlerMetadata {
     }
 
     return parameters;
+  }
+
+  /**
+   *
+   */
+  private resolve() {
+    this._useClass = this._target;
+
+    let handler = this._target;
+    let target = this._target;
+
+    if (GlobalProviders.has(this._target)) {
+      const provider = GlobalProviders.get(this._target)!;
+      this._type = HandlerType.CONTROLLER;
+
+      if (provider.type === ProviderType.MIDDLEWARE) {
+        this._type = HandlerType.MIDDLEWARE;
+        this._errorParam = Store.from(provider.provide).get("middlewareType") === MiddlewareType.ERROR;
+        this._methodClassName = "use";
+        this._useClass = target = provider.useClass;
+      }
+    }
+
+    if (this._methodClassName) {
+      this._injectable = ParamRegistry.isInjectable(target, this._methodClassName);
+      this._nextFunction = ParamRegistry.hasNextFunction(target, this._methodClassName);
+
+      handler = target.prototype[this._methodClassName];
+    }
+
+    if (!this._injectable) {
+      this._errorParam = handler.length === 4;
+      this._nextFunction = handler.length >= 3;
+    }
   }
 }

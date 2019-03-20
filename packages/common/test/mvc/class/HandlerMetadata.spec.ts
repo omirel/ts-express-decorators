@@ -1,5 +1,5 @@
 import {Store} from "@tsed/core";
-import {ParamRegistry, Provider, ProviderRegistry, ProviderType} from "../../../src";
+import {ParamRegistry, Provider, GlobalProviders, ProviderType} from "../../../src";
 import {HandlerMetadata} from "../../../src/mvc/class/HandlerMetadata";
 import {MiddlewareType} from "../../../src/mvc/interfaces";
 import {expect} from "chai";
@@ -20,7 +20,7 @@ describe("HandlerMetadata", () => {
     before(() => {
       this.isInjectableStub = Sinon.stub(ParamRegistry, "isInjectable").returns(false);
       this.hasNextFunctionStub = Sinon.stub(ParamRegistry, "hasNextFunction").returns(true);
-      this.providerHasStub = Sinon.stub(ProviderRegistry, "has").returns(false);
+      this.providerHasStub = Sinon.stub(GlobalProviders, "has").returns(false);
       this.handlerMetadata = new HandlerMetadata((req: any, res: any, next: any) => {});
     });
 
@@ -55,7 +55,7 @@ describe("HandlerMetadata", () => {
     before(() => {
       this.isInjectableStub = Sinon.stub(ParamRegistry, "isInjectable").returns(false);
       this.hasNextFunctionStub = Sinon.stub(ParamRegistry, "hasNextFunction").returns(true);
-      this.providerHasStub = Sinon.stub(ProviderRegistry, "has").returns(false);
+      this.providerHasStub = Sinon.stub(GlobalProviders, "has").returns(false);
 
       this.handlerMetadata = new HandlerMetadata((err: any, req: any, res: any, next: any) => {});
     });
@@ -91,7 +91,7 @@ describe("HandlerMetadata", () => {
     before(() => {
       this.isInjectableStub = Sinon.stub(ParamRegistry, "isInjectable").returns(false);
       this.hasNextFunctionStub = Sinon.stub(ParamRegistry, "hasNextFunction").returns(true);
-      this.providerHasStub = Sinon.stub(ProviderRegistry, "has").returns(false);
+      this.providerHasStub = Sinon.stub(GlobalProviders, "has").returns(false);
 
       this.handlerMetadata = new HandlerMetadata((req: any, res: any) => {});
     });
@@ -130,8 +130,8 @@ describe("HandlerMetadata", () => {
 
       this.isInjectableStub = Sinon.stub(ParamRegistry, "isInjectable").returns(false);
       this.hasNextFunctionStub = Sinon.stub(ParamRegistry, "hasNextFunction").returns(true);
-      this.providerHasStub = Sinon.stub(ProviderRegistry, "has").returns(true);
-      this.providerGetStub = Sinon.stub(ProviderRegistry, "get").returns(this.provider);
+      this.providerHasStub = Sinon.stub(GlobalProviders, "has").returns(true);
+      this.providerGetStub = Sinon.stub(GlobalProviders, "get").returns(this.provider);
 
       this.handlerMetadata = new HandlerMetadata(Test, "test");
     });
@@ -171,8 +171,8 @@ describe("HandlerMetadata", () => {
 
       this.isInjectableStub = Sinon.stub(ParamRegistry, "isInjectable").returns(true);
       this.hasNextFunctionStub = Sinon.stub(ParamRegistry, "hasNextFunction").returns(true);
-      this.providerHasStub = Sinon.stub(ProviderRegistry, "has").returns(true);
-      this.providerGetStub = Sinon.stub(ProviderRegistry, "get").returns(this.provider);
+      this.providerHasStub = Sinon.stub(GlobalProviders, "has").returns(true);
+      this.providerGetStub = Sinon.stub(GlobalProviders, "get").returns(this.provider);
 
       this.handlerMetadata = new HandlerMetadata(Test, "test");
     });
@@ -212,8 +212,8 @@ describe("HandlerMetadata", () => {
 
       this.isInjectableStub = Sinon.stub(ParamRegistry, "isInjectable").returns(true);
       this.hasNextFunctionStub = Sinon.stub(ParamRegistry, "hasNextFunction").returns(true);
-      this.providerHasStub = Sinon.stub(ProviderRegistry, "has").returns(true);
-      this.providerGetStub = Sinon.stub(ProviderRegistry, "get").returns(this.provider);
+      this.providerHasStub = Sinon.stub(GlobalProviders, "has").returns(true);
+      this.providerGetStub = Sinon.stub(GlobalProviders, "get").returns(this.provider);
 
       Store.from(Test).set("middlewareType", MiddlewareType.MIDDLEWARE);
 
@@ -263,8 +263,8 @@ describe("HandlerMetadata", () => {
 
       this.isInjectableStub = Sinon.stub(ParamRegistry, "isInjectable").returns(false);
       this.hasNextFunctionStub = Sinon.stub(ParamRegistry, "hasNextFunction").returns(false);
-      this.providerHasStub = Sinon.stub(ProviderRegistry, "has").returns(true);
-      this.providerGetStub = Sinon.stub(ProviderRegistry, "get").returns(this.provider);
+      this.providerHasStub = Sinon.stub(GlobalProviders, "has").returns(true);
+      this.providerGetStub = Sinon.stub(GlobalProviders, "get").returns(this.provider);
 
       Store.from(Test).set("middlewareType", MiddlewareType.MIDDLEWARE);
 
@@ -314,8 +314,8 @@ describe("HandlerMetadata", () => {
 
       this.isInjectableStub = Sinon.stub(ParamRegistry, "isInjectable").returns(true);
       this.hasNextFunctionStub = Sinon.stub(ParamRegistry, "hasNextFunction").returns(true);
-      this.providerHasStub = Sinon.stub(ProviderRegistry, "has").returns(true);
-      this.providerGetStub = Sinon.stub(ProviderRegistry, "get").returns(this.provider);
+      this.providerHasStub = Sinon.stub(GlobalProviders, "has").returns(true);
+      this.providerGetStub = Sinon.stub(GlobalProviders, "get").returns(this.provider);
 
       Store.from(Test).set("middlewareType", MiddlewareType.ERROR);
 
@@ -365,8 +365,8 @@ describe("HandlerMetadata", () => {
 
       this.isInjectableStub = Sinon.stub(ParamRegistry, "isInjectable").returns(false);
       this.hasNextFunctionStub = Sinon.stub(ParamRegistry, "hasNextFunction").returns(false);
-      this.providerHasStub = Sinon.stub(ProviderRegistry, "has").returns(true);
-      this.providerGetStub = Sinon.stub(ProviderRegistry, "get").returns(this.provider);
+      this.providerHasStub = Sinon.stub(GlobalProviders, "has").returns(true);
+      this.providerGetStub = Sinon.stub(GlobalProviders, "get").returns(this.provider);
 
       Store.from(Test).set("middlewareType", MiddlewareType.ERROR);
       this.handlerMetadata = new HandlerMetadata(Test2);
