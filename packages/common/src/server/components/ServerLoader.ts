@@ -14,7 +14,7 @@ import {LogIncomingRequestMiddleware} from "../../mvc/components/LogIncomingRequ
 import {ExpressApplication} from "../../mvc/decorators/class/expressApplication";
 import {HttpServer} from "../decorators/httpServer";
 import {HttpsServer} from "../decorators/httpsServer";
-import {IComponentScanned, IHTTPSServerOptions, IServerLifecycle} from "../interfaces";
+import {IComponentScanned, IServerLifecycle} from "../interfaces";
 import {createExpressApplication} from "../utils/createExpressApplication";
 import {createHttpServer} from "../utils/createHttpServer";
 import {createHttpsServer} from "../utils/createHttpsServer";
@@ -69,6 +69,7 @@ export abstract class ServerLoader implements IServerLifecycle {
   public version: string = "0.0.0-PLACEHOLDER";
   private _components: IComponentScanned[] = [];
   private _scannedPromises: Promise<any>[] = [];
+  private _injector: InjectorService;
 
   /**
    *
@@ -77,14 +78,14 @@ export abstract class ServerLoader implements IServerLifecycle {
     const settings = ServerSettingsService.getMetadata(this);
     this._injector = createInjector(settings);
 
-    createExpressApplication(this._injector);
-
     if (settings) {
       this.setSettings(settings);
     }
-  }
 
-  private _injector: InjectorService;
+    createExpressApplication(this.injector);
+    createHttpsServer(this.injector);
+    createHttpServer(this.injector);
+  }
 
   /**
    * Return the injectorService initialized by the server.
@@ -170,40 +171,6 @@ export abstract class ServerLoader implements IServerLifecycle {
         return Path.resolve(file);
       })
       .concat(excludes as any);
-  }
-
-  /**
-   * Create a new HTTP server with the provided `port`.
-   * @returns {ServerLoader}
-   */
-  public createHttpServer(port: string | number): ServerLoader {
-    createHttpServer(this.injector);
-    this.settings.httpPort = port;
-
-    return this;
-  }
-
-  /**
-   * Create a new HTTPs server.
-   *
-   * `options` {IHTTPSServerOptions}:
-   *
-   * - `port` &lt;number&gt;: Port number,
-   * - `key` &lt;string&gt; | &lt;string[]&gt; | [&lt;Buffer&gt;](https://nodejs.org/api/buffer.html#buffer_class_buffer) | &lt;Object[]&gt;: The private key of the server in PEM format. To support multiple keys using different algorithms an array can be provided either as a plain array of key strings or an array of objects in the format `{pem: key, passphrase: passphrase}`. This option is required for ciphers that make use of private keys.
-   * - `passphrase` &lt;string&gt; A string containing the passphrase for the private key or pfx.
-   * - `cert` &lt;string&gt; | &lt;string[]&gt; | [&lt;Buffer&gt;](https://nodejs.org/api/buffer.html#buffer_class_buffer) | [&lt;Buffer[]&gt;](https://nodejs.org/api/buffer.html#buffer_class_buffer): A string, Buffer, array of strings, or array of Buffers containing the certificate key of the server in PEM format. (Required)
-   * - `ca` &lt;string&gt; | &lt;string[]&gt; | [&lt;Buffer&gt;](https://nodejs.org/api/buffer.html#buffer_class_buffer) | [&lt;Buffer[]&gt;](https://nodejs.org/api/buffer.html#buffer_class_buffer): A string, Buffer, array of strings, or array of Buffers of trusted certificates in PEM format. If this is omitted several well known "root" CAs (like VeriSign) will be used. These are used to authorize connections.
-   *
-   * See more info on [httpsOptions](https://nodejs.org/api/tls.html#tls_tls_createserver_options_secureconnectionlistener).
-   *
-   * @param options Options to create new HTTPS server.
-   * @returns {ServerLoader}
-   */
-  public createHttpsServer(options: IHTTPSServerOptions): ServerLoader {
-    createHttpsServer(this.injector, options);
-    this.settings.httpsPort = options.port;
-
-    return this;
   }
 
   /**
@@ -500,22 +467,6 @@ export abstract class ServerLoader implements IServerLifecycle {
 
         case "componentsScan":
           this.settings.componentsScan.forEach(componentDir => this.scan(componentDir));
-          break;
-
-        case "httpPort":
-          /* istanbul ignore else */
-          if (value !== false && this.httpServer === undefined) {
-            this.createHttpServer(value);
-          }
-
-          break;
-
-        case "httpsPort":
-          /* istanbul ignore else */
-          if (value !== false && this.httpsServer === undefined) {
-            this.createHttpsServer(Object.assign(map.get("httpsOptions") || {}, {port: value}));
-          }
-
           break;
       }
     };
