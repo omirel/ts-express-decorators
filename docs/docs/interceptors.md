@@ -7,7 +7,7 @@ Creating and consuming an interceptor is two-step process.
 
 ## Decorators
 
-<ApiList query="module == '@tsed/common/interceptors' && symbolType === 'decorator'" />
+<ApiList query="module == '@tsed/di' && symbolType === 'decorator'" />
 
 ## Interceptor class
 
@@ -20,7 +20,6 @@ import { IInterceptor, IInterceptorContext, Interceptor, InjectorService } from 
 @Interceptor()
 export class MyInterceptor implements IInterceptor {
     // you can inject other components as usual
-    // be careful for circular dependencies in your components
     constructor(injSrv: InjectorService) {
         // do some logic
     }

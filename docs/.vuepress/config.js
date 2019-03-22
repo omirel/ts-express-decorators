@@ -13,9 +13,10 @@ module.exports = {
     ga: "UA-35240348-1",
     apiUrl: "/api.json",
     algolia: {
-      apiKey: 'f8a038207e461aaac0e2fd16403c2b01',
-      indexName: 'ts_ed',
+      apiKey: "f8a038207e461aaac0e2fd16403c2b01",
+      indexName: "ts_ed"
     },
+
     locales: {
       "/": {
         label: "English",
@@ -38,6 +39,33 @@ module.exports = {
             link: "/configuration.html"
           },
           {
+            text: "Docs",
+            items: [
+              {
+                text: "Overview",
+                items: [
+                  {link: "/docs/controllers.html", text: "Controllers", items: []},
+                  {link: "/docs/providers.html", text: "Providers"},
+                  {link: "/docs/model.html", text: "Models"},
+                  {link: "/docs/converters.html", text: "Converters"},
+                  {link: "/docs/middlewares.html", text: "Middlewares"},
+                  {link: "/docs/filters.html", text: "Filters"},
+                  {link: "/docs/interceptors.html", text: "Interceptors"},
+                  {link: "/docs/server-loader.html", text: "ServerLoader"}
+                ]
+              },
+              {
+                text: "Advanced",
+                items: [
+                  {link: "/docs/injection-scopes.html", text: "Injection scopes"},
+                  {link: "/docs/customer-provider.html", text: "Custom Providers"},
+                  {link: "/docs/testing.html", text: "Testing"},
+                  {link: "/api.html", text: "Api Reference"}
+                ]
+              }
+            ]
+          },
+          {
             text: "Guide",
             type: "links",
             items: [
@@ -58,27 +86,6 @@ module.exports = {
               {link: "/tutorials/not-found-page.html", text: "Customize 404"},
               {link: "/tutorials/aws.html", text: "AWS project"}
             ]
-          },
-          {
-            text: "Documentation",
-            items: [
-              {link: "/docs/controllers.html", text: "Controllers"},
-              {link: "/docs/services.html", text: "Services"},
-              {link: "/docs/factory.html", text: "Factory"},
-              {link: "/docs/provider.html", text: "Provider"},
-              {link: "/docs/model.html", text: "Models"},
-              {link: "/docs/converters.html", text: "Converters"},
-              {link: "/docs/middlewares.html", text: "Middlewares"},
-              {link: "/docs/scope.html", text: "Scope"},
-              {link: "/docs/filters.html", text: "Filters"},
-              {link: "/docs/interceptors.html", text: "Interceptors"},
-              {link: "/docs/server-loader.html", text: "ServerLoader"},
-              {link: "/docs/testing.html", text: "Testing"}
-            ]
-          },
-          {
-            text: "Api Reference",
-            link: "/api.html"
           }
         ],
 
@@ -100,24 +107,31 @@ module.exports = {
             ]
           }],
 
-          "/docs/": [{
-            title: "Documentation",
-            collapsable: false,
-            children: [
-              "controllers",
-              "services",
-              "factory",
-              "provider",
-              "model",
-              "converters",
-              "middlewares",
-              "scope",
-              "filters",
-              "interceptors",
-              "server-loader",
-              "testing"
-            ]
-          }],
+          "/docs/": [
+            {
+              title: "Overview",
+              collapsable: false,
+              children: [
+                "controllers",
+                "providers",
+                "model",
+                "converters",
+                "middlewares",
+                "filters",
+                "interceptors",
+                "server-loader"
+              ]
+            },
+            {
+              title: "Advanced",
+              collapsable: false,
+              children: [
+                "injection-scopes",
+                "custom-providers",
+                "testing"
+              ]
+            }
+          ],
 
 
           "/tutorials/": [{
@@ -163,16 +177,15 @@ module.exports = {
           "/tutorials/not-found-page",
           "/tutorials/aws",
           "/docs/controllers",
-          "/docs/services",
-          "/docs/factory",
-          "/docs/provider",
+          "/docs/providers",
           "/docs/model",
           "/docs/converters",
           "/docs/middlewares",
-          "/docs/scope",
           "/docs/filters",
           "/docs/interceptors",
           "/docs/server-loader",
+          "/docs/injection-scopes",
+          "/docs/custom-providers",
           "/docs/testing"
         ],
 
@@ -188,6 +201,12 @@ module.exports = {
           documentationGeneratedWith: "Documentation generated with"
         }
       }
+    }
+  },
+  markdown: {
+    lineNumbers: true,
+    config: md => {
+      md.use(require("vuepress-theme-tsed/plugins/markdown-it-symbol"));
     }
   }
 };

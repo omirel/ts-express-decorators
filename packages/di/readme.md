@@ -35,7 +35,7 @@ options in your `tsconfig.json` file.
 
 ## Introduction
 
-Basically, almost everything may be considered as a provider – service, factory, interceptors, and so on. 
+Basically, almost everything may be considered as a provider – service, factory, intereceptors, and so on. 
 All of them can inject dependencies, meaning, they can create various relationships with each other.
  But in fact, a provider is nothing else than just a simple class annotated with an `@Injectable()` decorator.
 
@@ -64,7 +64,7 @@ export class CalendarsService {
 Here's a CalendarsService, a basic class with one property and two methods. The only new trait is that it uses the `@Injectable()` decorator.
 The `@Injectable()` attaches the metadata, thereby Ts.ED knows that this class is a provider.
   
-Since we have the service class already done, let's use it inside a controller:
+Now we have the service class already done, let's use it inside a controller:
 ```typescript
 import { Controller, Post, Body, Get } from '@tsed/common';
 import { CalendarsService } from './CalendarsService';
@@ -89,8 +89,7 @@ export class CalendarService {
 used by the Ts.ED framework. Ts.ED DI allow you to define your own Provider and decorator.
 
 
-Now we can load the injector and use it:
-
+Finally, we can load the injector and use:
 ```typescript
 import {InjectorService} from "@tsed/di";
 import {CalendarCtrl} from "./CalendarCtrl";

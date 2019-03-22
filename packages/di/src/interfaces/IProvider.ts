@@ -1,4 +1,5 @@
 import {Type} from "@tsed/core";
+import {ProviderScope} from "./ProviderScope";
 import {ProviderType} from "./ProviderType";
 import {TokenProvider} from "./TokenProvider";
 
@@ -13,7 +14,7 @@ export interface IProvider<T> {
   /**
    * Provider type
    */
-  type: ProviderType | any;
+  type: ProviderType | string;
   /**
    * Instance build by the injector
    */
@@ -34,6 +35,10 @@ export interface IProvider<T> {
    * Provide predefined value
    */
   useValue?: any;
+  /**
+   * Scope used by the injector to build the provider.
+   */
+  scope?: ProviderScope;
 
   /**
    *
