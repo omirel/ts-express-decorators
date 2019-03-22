@@ -1,4 +1,4 @@
-import {Container} from "@tsed/di";
+import {LocalsContainer} from "@tsed/di";
 
 const express = require("express");
 
@@ -23,7 +23,7 @@ if (!express.request.setEndpoint) {
      *
      */
     createContainer() {
-      this._container = new Container();
+      this._container = new LocalsContainer();
     },
     /**
      *
@@ -35,7 +35,7 @@ if (!express.request.setEndpoint) {
      *
      */
     async destroyContainer() {
-      await (this._container as Container<any>).destroy();
+      await (this._container as LocalsContainer<any>).destroy();
       delete this._container;
     },
     /**

@@ -8,9 +8,9 @@ export interface RegistrySettings {
 
   /**
    *
-   * @param target
+   * @param provider
    * @param {Map<string | Function, any>} locals
-   * @param {any[]} designParamTypes
+   * @param deps
    */
-  onInvoke?(target: Provider<any>, locals: Map<string | Function, any>, designParamTypes: any[]): void;
+  onInvoke?(provider: Provider<any>, locals: Map<string | Function, any>, deps: any[]): void;
 }

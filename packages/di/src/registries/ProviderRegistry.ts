@@ -20,8 +20,13 @@ GlobalProviders.createRegistry(ProviderType.FACTORY, Provider);
  *
  * @type {Registry<Provider<any>, IProvider<any>>}
  */
-// tslint:disable-next-line: variable-name
 GlobalProviders.createRegistry(ProviderType.INTERCEPTOR, Provider);
+/**
+ *
+ */
+GlobalProviders.createRegistry(ProviderType.CONTROLLER, Provider, {
+  injectable: false
+});
 
 /**
  * Register a provider configuration.
@@ -186,7 +191,35 @@ export const registerValue = (provider: any | IProvider<any>, value?: any): void
  * @param provider Provider configuration.
  */
 export const registerService = GlobalProviders.createRegisterFn(ProviderType.SERVICE);
-
+/**
+ * Add a new controller in the `ProviderRegistry`. This controller will be built when `InjectorService` will be loaded.
+ *
+ * #### Example
+ *
+ * ```typescript
+ * import {registerController, InjectorService} from "@tsed/common";
+ *
+ * export default class MyController {
+ *     constructor(){}
+ *     transform() {
+ *         return "test";
+ *     }
+ * }
+ *
+ * registerController({provide: MyController});
+ * // or
+ * registerController(MyController);
+ *
+ * const injector = new InjectorService();
+ * injector.load();
+ *
+ * const myController = injector.get<MyController>(MyController);
+ * myController.getFoo(); // test
+ * ```
+ *
+ * @param provider Provider configuration.
+ */
+export const registerController = GlobalProviders.createRegisterFn(ProviderType.CONTROLLER);
 /**
  * Add a new interceptor in the `ProviderRegistry`. This interceptor will be built when `InjectorService` will be loaded.
  *

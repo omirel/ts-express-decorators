@@ -1,4 +1,4 @@
-import {IProvider} from "@tsed/di";
+import {IProvider} from "../interfaces/IProvider";
 import {ProviderType} from "../interfaces/ProviderType";
 import {TokenProvider} from "../interfaces/TokenProvider";
 import {GlobalProviders} from "../registries/GlobalProviders";
