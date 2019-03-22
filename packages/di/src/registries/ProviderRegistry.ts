@@ -117,6 +117,46 @@ export const registerFactory = (provider: any | IProvider<any>, instance?: any):
   );
   GlobalProviders.getRegistry(ProviderType.FACTORY).merge(provider.provide, provider);
 };
+
+/**
+ * Add a new value in the `ProviderRegistry`.
+ *
+ * #### Example with symbol definition
+ *
+ *
+ * ```typescript
+ * import {registerValue, InjectorService} from "@tsed/common";
+ *
+ * const MyValue = Symbol.from("MyValue")
+ *
+ * registerValue(MyValue, "myValue");
+ *
+ * @Service()
+ * export class OtherService {
+ *      constructor(@Inject(MyValue) myValue: string){
+ *          console.log(myValue); /// "myValue"
+ *      }
+ * }
+ * ```
+ */
+export const registerValue = (provider: any | IProvider<any>, value?: any): void => {
+  if (!provider.provide) {
+    provider = {
+      provide: provider
+    };
+  }
+
+  provider = Object.assign(
+    {
+      scope: ProviderScope.SINGLETON,
+      useValue: value
+    },
+    provider,
+    {type: ProviderType.VALUE}
+  );
+  GlobalProviders.getRegistry(ProviderType.VALUE).merge(provider.provide, provider);
+};
+
 /**
  * Add a new service in the `ProviderRegistry`. This service will be built when `InjectorService` will be loaded.
  *

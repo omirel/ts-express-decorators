@@ -3,7 +3,7 @@ import {Metadata, Store} from "@tsed/core";
 import {inject} from "@tsed/testing";
 import {expect} from "chai";
 import * as Sinon from "sinon";
-import {Container, InjectorService} from "../../src";
+import {ILocalsContainer, InjectorService, LocalsContainer} from "../../src";
 
 class Test {
   @Inject()
@@ -381,7 +381,7 @@ describe("InjectorService", () => {
 
       // THEN
       spyTest2.should.have.been.calledWithExactly(injector);
-      injector.invoke.should.have.been.calledWithExactly(InjectorService, Sinon.match.instanceOf(Container), {parent: Test});
+      injector.invoke.should.have.been.calledWithExactly(InjectorService, Sinon.match.instanceOf(LocalsContainer), {parent: Test});
       expect(result).to.eq(injector);
     });
   });

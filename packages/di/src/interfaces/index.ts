@@ -5,7 +5,7 @@ export * from "./IInterceptorContext";
 export * from "./IInvokeOptions";
 export * from "./IProvider";
 export * from "./InjectablePropertyType";
-export * from "./LocalsContainer";
+export * from "./ILocalsContainer";
 export * from "./OnDestroy";
 export * from "./OnInit";
 export * from "./ProviderScope";

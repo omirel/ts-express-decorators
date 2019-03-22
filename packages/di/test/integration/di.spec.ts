@@ -1,9 +1,9 @@
 import {
-  Container,
+  ILocalsContainer,
   GlobalProviders,
   InjectorService,
   OnDestroy,
-  Provider, ProviderContainer,
+  Provider, Container,
   ProviderScope,
   Scope,
   Service
@@ -47,7 +47,7 @@ describe("DI", () => {
     it("should load all providers with the SINGLETON scope only", async () => {
       // GIVEN
       const injector = new InjectorService();
-      const providers = new ProviderContainer();
+      const providers = new Container();
       providers.add(ServiceInstance);
       providers.add(ServiceSingleton);
       providers.add(ServiceRequest);

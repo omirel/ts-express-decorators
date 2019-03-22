@@ -1,7 +1,7 @@
 import {getClass, getClassOrSymbol, Metadata, nameOf, prototypeOf, Store, Type, deepClone} from "@tsed/core";
 import {Container} from "../class/Container";
+import {LocalsContainer} from "../class/LocalsContainer";
 import {Provider} from "../class/Provider";
-import {ProviderContainer} from "../class/ProviderContainer";
 import {Injectable} from "../decorators/injectable";
 import {
   IDISettings,
@@ -11,8 +11,9 @@ import {
   IInterceptor,
   IInterceptorContext,
   IInvokeOptions,
+  ILocalsContainer,
   InjectablePropertyType,
-  LocalsContainer,
+  IProvider,
   ProviderScope,
   TokenProvider
 } from "../interfaces";
@@ -53,11 +54,10 @@ interface IInvokeSettings {
  *
  */
 @Injectable({
-  provide: InjectorService,
   scope: ProviderScope.SINGLETON,
   global: true
 })
-export class InjectorService extends ProviderContainer {
+export class InjectorService extends Container {
   public settings: IDISettings = new Map();
   private _scopes: {[key: string]: ProviderScope} = {};
 
@@ -90,12 +90,12 @@ export class InjectorService extends ProviderContainer {
   }
 
   /**
-   *
+   * Add a provider to the
    * @param token
-   * @param value
+   * @param settings
    */
-  public addProvider(token: TokenProvider, value?: Provider<any>): this {
-    return super.add(token, value);
+  public addProvider(token: TokenProvider, settings: Partial<IProvider<any>> = {}): this {
+    return super.add(token, settings);
   }
 
   /**
@@ -203,7 +203,7 @@ export class InjectorService extends ProviderContainer {
    * @param options
    * @returns {T} The class constructed.
    */
-  public invoke<T>(token: TokenProvider, locals: LocalsContainer = new Container(), options: Partial<IInvokeOptions<T>> = {}): T {
+  public invoke<T>(token: TokenProvider, locals: ILocalsContainer = new LocalsContainer(), options: Partial<IInvokeOptions<T>> = {}): T {
     const provider = this.getProvider(token);
     let instance: any;
 
@@ -245,8 +245,8 @@ export class InjectorService extends ProviderContainer {
    *
    * @param providers
    */
-  async load(providers: Map<TokenProvider, Provider<any>> = GlobalProviders): Promise<Container<any>> {
-    const locals = new Container();
+  async load(providers: Map<TokenProvider, Provider<any>> = GlobalProviders): Promise<LocalsContainer<any>> {
+    const locals = new LocalsContainer();
 
     // Clone all providers in the container
     providers.forEach((provider, token) => {
@@ -314,7 +314,7 @@ export class InjectorService extends ProviderContainer {
     const originalMethod = instance[propertyKey];
     const deps = Metadata.getParamTypes(prototypeOf(target), propertyKey);
 
-    instance[propertyKey] = (locals: LocalsContainer = new Container()) => {
+    instance[propertyKey] = (locals: ILocalsContainer = new LocalsContainer()) => {
       const services = deps.map((dependency: any) =>
         this.invoke(dependency, locals, {
           parent: target
@@ -418,7 +418,7 @@ export class InjectorService extends ProviderContainer {
    * @param options
    * @private
    */
-  private _invoke<T>(target: TokenProvider, locals: LocalsContainer, options: Partial<IInvokeOptions<T>> = {}): T {
+  private _invoke<T>(target: TokenProvider, locals: ILocalsContainer, options: Partial<IInvokeOptions<T>> = {}): T {
     const {token, deps, construct, isBindable} = this.mapInvokeOptions(target, options);
 
     const {onInvoke} = GlobalProviders.getRegistrySettings(target); // FIXME should not be used

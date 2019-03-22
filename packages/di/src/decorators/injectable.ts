@@ -1,6 +1,6 @@
-import {IProvider} from "../interfaces";
-import {registerProvider} from "../registries/ProviderRegistry";
 import {Type} from "@tsed/core";
+import {IProvider, ProviderScope} from "../interfaces";
+import {registerProvider} from "../registries/ProviderRegistry";
 
 /**
  * The decorators `@Injectable()` declare a new service can be injected in other service or controller on there `constructor`.
@@ -11,10 +11,10 @@ import {Type} from "@tsed/core";
  * @returns {Function}
  * @decorator
  */
-export function Injectable(provider: Partial<IProvider<any>> = {}): Function {
+export function Injectable(options: Partial<IProvider<any>> = {scope: ProviderScope.SINGLETON}): Function {
   return (provide: Type<any>) => {
     registerProvider({
-      ...provider,
+      ...options,
       provide
     });
   };

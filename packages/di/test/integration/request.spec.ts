@@ -1,7 +1,7 @@
 import {expect} from "chai";
 import * as Sinon from "sinon";
 import {GlobalProviders, InjectorService, OnDestroy, ProviderScope, Scope, Service} from "../../src";
-import {Container} from "../../src/class/Container";
+import {LocalsContainer} from "../../src/class/LocalsContainer";
 
 describe("DI", () => {
   @Service()
@@ -45,7 +45,7 @@ describe("DI", () => {
         await injector.load();
 
         // we use a local container to create a new context
-        const locals = new Container();
+        const locals = new LocalsContainer();
 
         // WHEN
         const result1: any = injector.invoke(ServiceRequest, locals);

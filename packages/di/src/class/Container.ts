@@ -1,28 +1,33 @@
+import {IProvider} from "@tsed/di";
+import {ProviderType} from "../interfaces/ProviderType";
 import {TokenProvider} from "../interfaces/TokenProvider";
+import {GlobalProviders} from "../registries/GlobalProviders";
+import {LocalsContainer} from "./LocalsContainer";
+import {Provider} from "./Provider";
 
-export class Container<V> extends Map<TokenProvider, V> {
+export class Container extends LocalsContainer<Provider<any>> {
   /**
-   * Emit an event to all service. See service [lifecycle hooks](/docs/services.md#lifecycle-hooks).
-   * @param eventName The event name to emit at all services.
-   * @param args List of the parameters to give to each services.
-   * @returns {Promise<any[]>} A list of promises.
+   *
+   * @param token
+   * @param settings
    */
-  public async emit(eventName: string, ...args: any[]) {
-    const instances: any[] = this.toArray();
+  public add(token: TokenProvider, settings: Partial<IProvider<any>> = {}): this {
+    const provider = GlobalProviders.has(token) ? GlobalProviders.get(token)!.clone() : new Provider(token);
 
-    for (const instance of instances) {
-      if (typeof instance === "object" && instance && eventName in instance) {
-        await instance[eventName](...args);
-      }
-    }
+    Object.assign(provider, settings);
+
+    return super.set(token, provider);
   }
 
-  toArray() {
-    return Array.from(this.values());
-  }
-
-  async destroy() {
-    await this.emit("$onDestroy");
-    this.clear();
+  /**
+   * Get all providers registered in the injector container.
+   *
+   * @param {ProviderType} type Filter the list by the given ProviderType.
+   * @returns {[RegistryKey , Provider<any>][]}
+   */
+  public getProviders(type?: ProviderType | string): Provider<any>[] {
+    return Array.from(this)
+      .filter(([key, provider]) => (type ? provider.type === type : true))
+      .map(([key, provider]) => provider);
   }
 }
