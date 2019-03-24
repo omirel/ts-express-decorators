@@ -1,5 +1,5 @@
 import {Enumerable, NotEnumerable, Type} from "@tsed/core";
-import {Provider} from "@tsed/di";
+import {Provider, ProviderType} from "@tsed/di";
 import * as Express from "express";
 import {IRouterSettings} from "../../config/interfaces/IServerSettings";
 
@@ -25,11 +25,11 @@ export class ControllerProvider extends Provider<any> implements IControllerOpti
    * @private
    */
   @NotEnumerable()
-  private _dependencies: IChildrenController[] = [];
+  private _children: IChildrenController[] = [];
 
   constructor(provide: any) {
     super(provide);
-    this.type = "controller";
+    this.type = ProviderType.CONTROLLER;
   }
 
   /**
@@ -44,8 +44,8 @@ export class ControllerProvider extends Provider<any> implements IControllerOpti
    *
    * @returns {Type<any>[]}
    */
-  get dependencies(): IChildrenController[] {
-    return this._dependencies;
+  get children(): IChildrenController[] {
+    return this._children;
   }
 
   /**
@@ -53,9 +53,9 @@ export class ControllerProvider extends Provider<any> implements IControllerOpti
    * @param dependencies
    */
   @Enumerable()
-  set dependencies(dependencies: IChildrenController[]) {
-    this._dependencies = dependencies;
-    this._dependencies.forEach(d => (d.$parentCtrl = this));
+  set children(dependencies: IChildrenController[]) {
+    this._children = dependencies;
+    this._children.forEach(d => (d.$parentCtrl = this));
   }
 
   /**
@@ -129,8 +129,8 @@ export class ControllerProvider extends Provider<any> implements IControllerOpti
    *
    * @returns {boolean}
    */
-  public hasDependencies(): boolean {
-    return !!this.dependencies.length;
+  public hasChildren(): boolean {
+    return !!this.children.length;
   }
 
   /**

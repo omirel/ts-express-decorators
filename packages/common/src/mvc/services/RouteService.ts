@@ -119,7 +119,7 @@ export class RouteService implements AfterRoutesInit {
   private buildRoutes(routes: any[], ctrl: ControllerProvider, endpointUrl: string) {
     // console.log("Build routes =>", ctrl.className, endpointUrl);
 
-    ctrl.dependencies
+    ctrl.children
       .map(ctrl => this.injectorService.getProvider(ctrl))
       .forEach((provider: ControllerProvider) => this.buildRoutes(routes, provider, `${endpointUrl}${provider.path}`));
 

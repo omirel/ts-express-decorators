@@ -96,7 +96,7 @@ export abstract class ServerLoader implements IServerLifecycle {
   }
 
   /**
-   * Return the settings configured by the decorator [@ServerSettings](/api/common/server/decorators/ServerSettings.md).
+   * Return the settings configured by the decorator @@ServerSettings@@.
    *
    * ```typescript
    * @ServerSettings({
@@ -326,7 +326,7 @@ export abstract class ServerLoader implements IServerLifecycle {
   }
 
   /**
-   * Add classes decorated by `@Controller()` to components container.
+   * Add classes decorated by @@Controller()@@ to components container.
    *
    * ### Example
    *
@@ -352,7 +352,12 @@ export abstract class ServerLoader implements IServerLifecycle {
 
   /**
    * Mount all controllers files that match with `globPattern` ([Glob Pattern](https://www.npmjs.com/package/glob))
-   * under the endpoint. See [Versioning Rest API](/docs/server-loader.md#versioning) for more information.
+   * under the endpoint.
+   *
+   * ::: tip
+   * See [Versioning Rest API](/docs/controllers.md#routing) for more information.
+   * :::
+   *
    * @param endpoint
    * @param list
    * @returns {ServerLoader}
@@ -493,7 +498,7 @@ export abstract class ServerLoader implements IServerLifecycle {
 
   /**
    * Initiliaze all servers.
-   * @returns {Bluebird<U>}
+   * @returns {Promise<U>}
    */
   private async startServers(): Promise<any> {
     const promises: Promise<any>[] = [];

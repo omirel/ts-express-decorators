@@ -26,7 +26,7 @@ export class ControllerBuilder {
 
     this.buildMiddlewares(injector, this.provider.middlewares.useAfter!);
 
-    ctrl.dependencies.forEach((child: Type<any>) => {
+    ctrl.children.forEach((child: Type<any>) => {
       const provider = injector.getProvider(child) as ControllerProvider;
 
       /* istanbul ignore next */

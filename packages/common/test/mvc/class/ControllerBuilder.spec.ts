@@ -20,7 +20,7 @@ describe("ControllerBuilder", () => {
     })
   );
 
-  describe("without dependencies", () => {
+  describe("without children", () => {
     before(() => {
       this.endpointBuildStub = Sinon.stub(EndpointBuilder.prototype, "build");
 
@@ -53,14 +53,14 @@ describe("ControllerBuilder", () => {
     });
   });
 
-  describe("with dependencies", () => {
+  describe("with children", () => {
     before(
       inject([], () => {
         this.endpointBuildStub = Sinon.stub(EndpointBuilder.prototype, "build");
 
         this.controllerProvider = new ControllerProvider(Test);
         this.controllerProvider.path = "/test";
-        this.controllerProvider.dependencies = [ChildrenTest];
+        this.controllerProvider.children = [ChildrenTest];
         this.controllerBuilder = new ControllerBuilder(this.controllerProvider);
 
         EndpointRegistry.use(Test, "test", ["get", "/"]);
@@ -74,7 +74,7 @@ describe("ControllerBuilder", () => {
             useAfter: []
           },
           endpoints: [],
-          dependencies: [],
+          children: [],
           useClass: ChildrenTest,
           path: "/children"
         });

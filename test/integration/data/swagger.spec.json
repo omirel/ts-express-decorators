@@ -13,12 +13,6 @@
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
-  "consumes": [
-    "application/json"
-  ],
-  "produces": [
-    "application/json"
-  ],
   "securityDefinitions": {
     "global_auth": {
       "type": "oauth2",
@@ -39,10 +33,16 @@
       }
     }
   },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
   "tags": [
     {
-      "description": "Controller description",
-      "name": "CalendarCtrl"
+      "name": "CalendarCtrl",
+      "description": "Controller description"
     },
     {
       "name": "EventCtrl"
@@ -55,121 +55,6 @@
     }
   ],
   "paths": {
-    "/rest/html": {
-      "get": {
-        "operationId": "RestCtrl.render",
-        "tags": [
-          "RestCtrl"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
-    "/rest/test/{required}": {
-      "get": {
-        "operationId": "RestCtrl.test",
-        "tags": [
-          "RestCtrl"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "required",
-            "type": "string",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
-    "/rest/test/{required}/{optional}": {
-      "get": {
-        "operationId": "RestCtrl.test_1",
-        "tags": [
-          "RestCtrl"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "required",
-            "type": "string",
-            "required": true
-          },
-          {
-            "in": "path",
-            "name": "optional",
-            "type": "string",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
-    "/rest/calendars/events/{eventId}/tasks": {
-      "get": {
-        "operationId": "TaskCtrl.get",
-        "tags": [
-          "TaskCtrl"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "eventId",
-            "type": "string",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        }
-      }
-    },
-    "/rest/calendars/events/{eventId}/tasks/hiddenparam": {
-      "get": {
-        "operationId": "TaskCtrl.getHiddenParams",
-        "tags": [
-          "TaskCtrl"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "eventId",
-            "type": "string",
-            "required": true
-          },
-          {
-            "in": "query",
-            "name": "q",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        }
-      }
-    },
     "/rest/calendars/events": {
       "head": {
         "operationId": "EventCtrl.head",
@@ -192,31 +77,6 @@
             "description": "Success"
           }
         }
-      }
-    },
-    "/rest/calendars/events/status": {
-      "get": {
-        "operationId": "EventCtrl.byStatus",
-        "parameters": [
-          {
-            "collectionFormat": "multi",
-            "in": "query",
-            "items": {
-              "type": "string"
-            },
-            "name": "status",
-            "required": false,
-            "type": "array"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "tags": [
-          "EventCtrl"
-        ]
       }
     },
     "/rest/calendars/events/{id}": {
@@ -368,6 +228,31 @@
           }
         },
         "summary": "Return all elements from a service"
+      }
+    },
+    "/rest/calendars/events/status": {
+      "get": {
+        "operationId": "EventCtrl.byStatus",
+        "tags": [
+          "EventCtrl"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "type": "array",
+            "collectionFormat": "multi",
+            "items": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
       }
     },
     "/rest/calendars/events/{resources}/test/{id}": {
@@ -783,6 +668,121 @@
           }
         },
         "summary": "Return all elements from a service"
+      }
+    },
+    "/rest/{eventId}/tasks": {
+      "get": {
+        "operationId": "TaskCtrl.get",
+        "tags": [
+          "TaskCtrl"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "eventId",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/rest/{eventId}/tasks/hiddenparam": {
+      "get": {
+        "operationId": "TaskCtrl.getHiddenParams",
+        "tags": [
+          "TaskCtrl"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "eventId",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/rest/html": {
+      "get": {
+        "operationId": "RestCtrl.render",
+        "tags": [
+          "RestCtrl"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/rest/test/{required}": {
+      "get": {
+        "operationId": "RestCtrl.test",
+        "tags": [
+          "RestCtrl"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "required",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/rest/test/{required}/{optional}": {
+      "get": {
+        "operationId": "RestCtrl.test_1",
+        "tags": [
+          "RestCtrl"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "required",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "optional",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
       }
     }
   },

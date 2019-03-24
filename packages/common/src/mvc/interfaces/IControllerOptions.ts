@@ -10,7 +10,7 @@ import {PathParamsType} from "./PathParamsType";
  */
 export interface IControllerOptions extends Partial<IProvider<any>> {
   path?: PathParamsType;
-  dependencies?: Type<any>[];
+  children?: Type<any>[];
   routerOptions?: IRouterSettings;
   middlewares?: IControllerMiddlewares;
 }

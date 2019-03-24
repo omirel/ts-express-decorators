@@ -22,7 +22,7 @@ describe("@Controller", () => {
     // THEN
     provider.type.should.equal(ProviderType.CONTROLLER);
     provider.path.should.equal("/test");
-    provider.dependencies.should.deep.equal([Dep]);
+    provider.children.should.deep.equal([Dep]);
   });
 
   it("should register a controller with customer provider options", () => {
@@ -40,6 +40,6 @@ describe("@Controller", () => {
     provider.type.should.equal(ProviderType.CONTROLLER);
     provider.scope.should.equal(ProviderScope.REQUEST);
     provider.path.should.equal("/test");
-    provider.dependencies.should.deep.equal([Dep]);
+    provider.children.should.deep.equal([Dep]);
   });
 });
