@@ -1,4 +1,3 @@
-import {expect} from "chai";
 import {
   GlobalProviders,
   IInterceptor,
@@ -44,6 +43,8 @@ describe("DI", () => {
       injector.addProvider(MyInterceptor);
       injector.addProvider(ServiceTest);
 
+      await injector.load();
+
       const serviceTest = injector.invoke<ServiceTest>(ServiceTest)!;
 
       // WHEN
@@ -58,6 +59,8 @@ describe("DI", () => {
       const injector = new InjectorService();
       injector.addProvider(MyInterceptor);
       injector.addProvider(ServiceTest);
+
+      await injector.load();
 
       const serviceTest = injector.invoke<ServiceTest>(ServiceTest)!;
 

@@ -407,7 +407,7 @@ export class InjectorService extends Container {
         }
       };
 
-      return this.invoke<IInterceptor>(useType).aroundInvoke(context, options);
+      return this.get<IInterceptor>(useType)!.aroundInvoke(context, options);
     };
   }
 

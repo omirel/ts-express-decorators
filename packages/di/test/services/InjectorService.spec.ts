@@ -1,9 +1,8 @@
-import {GlobalProviders, Inject, Provider, ProviderScope, ProviderType} from "@tsed/common";
-import {Metadata, Store} from "@tsed/core";
-import {inject} from "@tsed/testing";
+import {Inject, Provider, ProviderScope, ProviderType} from "@tsed/common";
+import {Store} from "@tsed/core";
 import {expect} from "chai";
 import * as Sinon from "sinon";
-import {ILocalsContainer, InjectorService, LocalsContainer} from "../../src";
+import {InjectorService, LocalsContainer} from "../../src";
 
 class Test {
   @Inject()
@@ -448,7 +447,7 @@ describe("InjectorService", () => {
 
     after(() => sandbox.restore());
 
-    it("should bind the method", () => {
+    it("should bind the method", async  () => {
       // GIVEN
       class InterceptorTest {
         aroundInvoke(ctx: any) {
@@ -457,10 +456,14 @@ describe("InjectorService", () => {
       }
 
       const injector = new InjectorService();
+      injector.addProvider(InterceptorTest);
+
+      await injector.load();
+
       const instance = new Test();
       const originalMethod = instance["test"];
 
-      sandbox.spy(injector, "invoke");
+      sandbox.spy(injector, "get");
 
       // WHEN
       injector.bindInterceptor(instance, {
@@ -473,7 +476,7 @@ describe("InjectorService", () => {
 
       // THEN
       expect(originalMethod).should.not.eq(instance.test3);
-      injector.invoke.should.have.been.calledWithExactly(InterceptorTest);
+      injector.get.should.have.been.calledWithExactly(InterceptorTest);
 
       expect(result).to.eq("test called  intercepted");
     });
