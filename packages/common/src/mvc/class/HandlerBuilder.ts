@@ -52,13 +52,15 @@ export class HandlerBuilder {
 
   /**
    *
+   * @param locals
    */
-  private getHandler(locals: Map<string | Function, any> = new Map<string | Function, any>()): Function {
+  private async getHandler(locals: Map<string | Function, any> = new Map<string | Function, any>()): Promise<Function> {
     if (this.handlerMetadata.type === HandlerType.FUNC) {
       return this.handlerMetadata.target;
     }
 
-    const instance: any = this.injector.invoke(this.handlerMetadata.target, locals, {useScope: true});
+    // Considering the injector.invoke return always a promise
+    const instance: any = await this.injector.invoke(this.handlerMetadata.target, locals);
 
     return instance[this.handlerMetadata.methodClassName!].bind(instance);
   }
@@ -77,7 +79,8 @@ export class HandlerBuilder {
     try {
       this.log(request, {event: "invoke.start"});
       const args = this.runFilters(request, response, next, err);
-      const result = await this.getHandler(request.getContainer())(...args);
+      const handler = await this.getHandler(request.getContainer());
+      const result = await handler(...args);
 
       if (!next.isCalled) {
         if (this.handlerMetadata.type !== "function" && result !== undefined) {

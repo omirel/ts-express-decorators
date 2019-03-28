@@ -1,7 +1,7 @@
 import "@tsed/ajv";
 import {InjectorService, ProviderType} from "@tsed/di";
 import {inject} from "@tsed/testing";
-import {assert, expect} from "chai";
+import {expect} from "chai";
 import * as Sinon from "sinon";
 import {BadRequest} from "ts-httpexceptions";
 import {FakeRequest} from "../../../../../test/helper/FakeRequest";
@@ -421,23 +421,25 @@ describe("HandlerBuilder", () => {
   });
   describe("getHandler()", () => {
     describe("function", () => {
-      before(() => {
-        this.handlerMetadata = {
+      it("should return the function handler", async () => {
+        // GIVEN
+        const handlerMetadata = {
           type: "function",
           target: "target"
         };
-        this.handlerBuilder = new HandlerBuilder(this.handlerMetadata);
-      });
 
-      it("should return the function handler", () => {
-        this.handlerBuilder.getHandler().should.eq("target");
-      });
-      it("should return the function handler without rebuild", () => {
-        this.handlerBuilder.getHandler().should.eq("target");
+        const handlerBuilder: any = new HandlerBuilder(handlerMetadata as any);
+
+        // WHEN
+        const handler = await handlerBuilder.getHandler();
+
+        // THEN
+        handler.should.eq("target");
       });
     });
+
     describe("component (middleware)", () => {
-      it("should return the handler", () => {
+      it("should return the handler", async () => {
         // GIVEN
         const handlerMetadata = {
           type: ProviderType.MIDDLEWARE,
@@ -454,13 +456,12 @@ describe("HandlerBuilder", () => {
         };
 
         // WHEN
-        const result = (handlerBuilder as any).getHandler();
+        const result = await (handlerBuilder as any).getHandler();
 
         // THEN
         (handlerBuilder as any).injector.invoke.should.have.been.calledWithExactly(
           handlerMetadata.target,
-          Sinon.match.instanceOf(Map),
-          {useScope: true}
+          Sinon.match.instanceOf(Map)
         );
 
         result.should.instanceof(Function);
@@ -468,7 +469,7 @@ describe("HandlerBuilder", () => {
     });
 
     describe("component (controller)", () => {
-      it("should return the handler", () => {
+      it("should return the handler", async () => {
         // GIVEN
         const handlerMetadata = {
           type: ProviderType.CONTROLLER,
@@ -485,13 +486,12 @@ describe("HandlerBuilder", () => {
         };
 
         // WHEN
-        const result = (handlerBuilder as any).getHandler();
+        const result = await (handlerBuilder as any).getHandler();
 
         // THEN
         (handlerBuilder as any).injector.invoke.should.have.been.calledWithExactly(
           handlerMetadata.target,
-          Sinon.match.instanceOf(Map),
-          {useScope: true}
+          Sinon.match.instanceOf(Map)
         );
 
         result.should.instanceof(Function);
