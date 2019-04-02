@@ -7,7 +7,7 @@ import {SERVER_SETTINGS} from "../../../src/config/constants";
 import {HttpServer, HttpsServer, ServerLoader} from "../../../src/server";
 
 describe("ServerLoader", () => {
-  before(() => {
+  before(async () => {
     class TestServer extends ServerLoader {
       $onInit() {
       }
@@ -23,13 +23,16 @@ describe("ServerLoader", () => {
     }
 
     Metadata.set(SERVER_SETTINGS, {debug: true, port: 8000, httpsPort: 8080}, TestServer);
+    const server = new TestServer();
+    this.server = server;
 
-    this.server = new TestServer();
-    this.server.settings.httpPort = 8080;
-    this.server.settings.httpsPort = 8000;
-    this.useStub = Sinon.stub(this.server.expressApp, "use");
-    this.setStub = Sinon.stub(this.server.expressApp, "set");
-    this.engineStub = Sinon.stub(this.server.expressApp, "engine");
+    await server.init();
+
+    server.settings.httpPort = 8080;
+    server.settings.httpsPort = 8000;
+    this.useStub = Sinon.stub(server.expressApp, "use");
+    this.setStub = Sinon.stub(server.expressApp, "set");
+    this.engineStub = Sinon.stub(server.expressApp, "engine");
   });
 
   after(() => {

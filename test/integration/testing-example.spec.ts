@@ -96,7 +96,7 @@ describe("Example Test", () => {
     before(bootstrap(FakeServer));
     after(TestContext.reset);
 
-    it("should do something", () => {
+    it("should do something", async () => {
       // GIVEN
       const fakeDBService = {
         getData: () => {
@@ -105,7 +105,7 @@ describe("Example Test", () => {
       };
 
       // WHEN
-      const instance: MyCtrl = TestContext.invoke(MyCtrl, [{provide: DbService, use: fakeDBService}]);
+      const instance: MyCtrl = await TestContext.invoke(MyCtrl, [{provide: DbService, use: fakeDBService}]);
 
       // THEN
       // and test it

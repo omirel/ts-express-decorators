@@ -1,22 +1,27 @@
-import {InjectorService, GlobalProviders, ProviderType} from "@tsed/di";
+import {GlobalProviders, InjectorService, ProviderType} from "@tsed/di";
 import {ServerSettingsService} from "../../config/services/ServerSettingsService";
 
-export function createInjector(settings: any) {
+export async function createInjector(settings: any): Promise<InjectorService> {
   const injector = new InjectorService();
-  injector.settings = createSettingsService(injector);
+
+  // Init settings
+  injector.settings = await createSettingsService(injector);
+
   injector.scopes = {
     ...(settings.scopes || {}),
     [ProviderType.CONTROLLER]: settings.controllerScope
   };
 
+  console.log("===", injector.settings);
+
   return injector;
 }
 
-function createSettingsService(injector: InjectorService) {
-  const provider = GlobalProviders.get(ServerSettingsService)!;
-  const settingsService = injector.invoke<ServerSettingsService>(provider.useClass);
+async function createSettingsService(injector: InjectorService): Promise<ServerSettingsService> {
+  const provider = GlobalProviders.get(ServerSettingsService)!.clone();
 
-  injector.forkProvider(ServerSettingsService, settingsService);
+  provider.instance = await injector.invoke<ServerSettingsService>(provider.useClass);
+  injector.addProvider(ServerSettingsService, provider);
 
-  return settingsService;
+  return provider.instance;
 }

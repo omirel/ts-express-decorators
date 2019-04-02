@@ -1,4 +1,4 @@
-import {getClass, getClassOrSymbol, Metadata, nameOf, prototypeOf, Store, Type, deepClone} from "@tsed/core";
+import {deepClone, getClass, getClassOrSymbol, Metadata, nameOf, prototypeOf, Store, Type} from "@tsed/core";
 import {Container} from "../class/Container";
 import {LocalsContainer} from "../class/LocalsContainer";
 import {Provider} from "../class/Provider";
@@ -63,7 +63,8 @@ export class InjectorService extends Container {
 
   constructor() {
     super();
-    this.forkProvider(InjectorService, this);
+    const provider = this.addProvider(InjectorService).getProvider(InjectorService)!;
+    provider.instance = this;
   }
 
   /**
@@ -136,9 +137,7 @@ export class InjectorService extends Container {
       instance = this.invoke(token);
     }
 
-    // By definition a forked provider isn't buildable
     provider.instance = instance;
-    provider.buildable = false;
 
     return provider;
   }

@@ -74,18 +74,7 @@ export abstract class ServerLoader implements IServerLifecycle {
   /**
    *
    */
-  constructor() {
-    const settings = ServerSettingsService.getMetadata(this);
-    this._injector = createInjector(settings);
-
-    if (settings) {
-      this.setSettings(settings);
-    }
-
-    createExpressApplication(this.injector);
-    createHttpsServer(this.injector);
-    createHttpServer(this.injector);
-  }
+  constructor() {}
 
   /**
    * Return the injectorService initialized by the server.
@@ -131,6 +120,7 @@ export abstract class ServerLoader implements IServerLifecycle {
   /**
    * Return the InjectorService initialized by the server.
    * @returns {InjectorService}
+   * @deprecated
    */
   get injectorService(): InjectorService {
     return this._injector;
@@ -141,7 +131,7 @@ export abstract class ServerLoader implements IServerLifecycle {
    * @returns {Http.Server}
    */
   get httpServer(): Http.Server {
-    return this.injectorService.get<HttpServer>(HttpServer)!;
+    return this.injector.get<HttpServer>(HttpServer)!;
   }
 
   /**
@@ -149,7 +139,7 @@ export abstract class ServerLoader implements IServerLifecycle {
    * @returns {Https.Server}
    */
   get httpsServer(): Https.Server {
-    return this.injectorService.get<HttpsServer>(HttpsServer)!;
+    return this.injector.get<HttpsServer>(HttpsServer)!;
   }
 
   /**
@@ -171,6 +161,25 @@ export abstract class ServerLoader implements IServerLifecycle {
         return Path.resolve(file);
       })
       .concat(excludes as any);
+  }
+
+  /**
+   * Init injector with minimal configuration
+   * @deprecated
+   */
+  async init() {
+    console.log("===> ServerLoader.init()");
+    const settings = ServerSettingsService.getMetadata(this);
+
+    this._injector = await createInjector(settings);
+
+    if (settings) {
+      this.setSettings(settings);
+    }
+
+    await createExpressApplication(this.injector);
+    await createHttpsServer(this.injector);
+    await createHttpServer(this.injector);
   }
 
   /**

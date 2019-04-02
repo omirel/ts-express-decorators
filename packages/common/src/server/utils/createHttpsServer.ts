@@ -4,8 +4,8 @@ import {ServerSettingsService} from "../../config";
 import {ExpressApplication} from "../../mvc/decorators";
 import {HttpsServer} from "../decorators/httpsServer";
 
-export function createHttpsServer(injector: InjectorService): void {
-  injector.forkProvider(HttpsServer);
+export async function createHttpsServer(injector: InjectorService): Promise<void> {
+  await injector.forkProvider(HttpsServer);
 }
 
 registerProvider({
