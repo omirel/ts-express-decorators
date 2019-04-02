@@ -114,10 +114,13 @@ export class TestContext {
       }
 
       const injector: InjectorService = TestContext.injector;
-      const args = targets.map(target => (injector.has(target) ? injector.get(target) : injector.invoke(target)));
-      const result = await func(...args);
+      const deps = [];
 
-      return result;
+      for (const target of targets) {
+        deps.push(injector.has(target) ? injector.get(target) : await injector.invoke(target));
+      }
+
+      return await func(...deps);
     };
   }
 

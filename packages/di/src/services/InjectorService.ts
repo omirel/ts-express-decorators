@@ -130,11 +130,11 @@ export class InjectorService extends Container {
    * @param token
    * @param instance
    */
-  public forkProvider(token: TokenProvider, instance?: any): Provider<any> {
+  public async forkProvider(token: TokenProvider, instance?: any): Promise<Provider<any>> {
     const provider = this.addProvider(token).getProvider(token)!;
 
     if (!instance) {
-      instance = this.invoke(token);
+      instance = await this.invoke(token);
     }
 
     provider.instance = instance;
@@ -202,31 +202,35 @@ export class InjectorService extends Container {
    * @param options
    * @returns {T} The class constructed.
    */
-  public invoke<T>(token: TokenProvider, locals: ILocalsContainer = new LocalsContainer(), options: Partial<IInvokeOptions<T>> = {}): T {
+  public async invoke<T>(
+    token: TokenProvider,
+    locals: ILocalsContainer = new LocalsContainer(),
+    options: Partial<IInvokeOptions<T>> = {}
+  ): Promise<T> {
     const provider = this.getProvider(token);
     let instance: any;
 
     if (locals.has(token)) {
       instance = locals.get(token);
     } else if (!provider || options.rebuild) {
-      instance = this._invoke(token, locals, options);
+      instance = await this._invoke(token, locals, options);
     } else {
       switch (this.scopeOf(provider)) {
         case ProviderScope.SINGLETON:
           if (!this.has(token)) {
-            provider.instance = this._invoke(token, locals, options);
+            provider.instance = await this._invoke(token, locals, options);
           }
 
           instance = this.get<T>(token)!;
           break;
 
         case ProviderScope.REQUEST:
-          locals.set(token, this._invoke(token, locals, options));
-
-          instance = locals.get(token);
+          instance = await this._invoke(token, locals, options);
+          locals.set(token, instance);
           break;
+
         case ProviderScope.INSTANCE:
-          instance = this._invoke(provider.provide, locals, options);
+          instance = await this._invoke(provider.provide, locals, options);
           break;
       }
     }
@@ -242,27 +246,29 @@ export class InjectorService extends Container {
   /**
    * Build all providers from GlobalProviders or from given providers parameters and emit `$onInit` event.
    *
-   * @param providers
+   * @param container
    */
-  async load(providers: Map<TokenProvider, Provider<any>> = GlobalProviders): Promise<LocalsContainer<any>> {
+  async load(container: Map<TokenProvider, Provider<any>> = GlobalProviders): Promise<LocalsContainer<any>> {
     const locals = new LocalsContainer();
 
     // Clone all providers in the container
-    providers.forEach((provider, token) => {
+    container.forEach((provider, token) => {
       if (!this.hasProvider(token)) {
         this.setProvider(token, provider.clone());
       }
     });
 
-    this.forEach(provider => {
+    const providers = super.toArray();
+
+    for (const provider of providers) {
       if (!locals.has(provider.provide) && this.scopeOf(provider) === ProviderScope.SINGLETON) {
-        this.invoke(provider.provide, locals);
+        await this.invoke(provider.provide, locals);
       }
 
       if (provider.instance) {
         locals.set(provider.provide, provider.instance);
       }
-    });
+    }
 
     await locals.emit("$onInit");
 
@@ -313,12 +319,8 @@ export class InjectorService extends Container {
     const originalMethod = instance[propertyKey];
     const deps = Metadata.getParamTypes(prototypeOf(target), propertyKey);
 
-    instance[propertyKey] = (locals: ILocalsContainer = new LocalsContainer()) => {
-      const services = deps.map((dependency: any) =>
-        this.invoke(dependency, locals, {
-          parent: target
-        })
-      );
+    instance[propertyKey] = () => {
+      const services = deps.map((dependency: any) => this.get(dependency));
 
       return originalMethod.call(instance, ...services);
     };
@@ -417,7 +419,7 @@ export class InjectorService extends Container {
    * @param options
    * @private
    */
-  private _invoke<T>(target: TokenProvider, locals: ILocalsContainer, options: Partial<IInvokeOptions<T>> = {}): T {
+  private async _invoke<T>(target: TokenProvider, locals: ILocalsContainer, options: Partial<IInvokeOptions<T>> = {}): Promise<T> {
     const {token, deps, construct, isBindable} = this.mapInvokeOptions(target, options);
 
     const {onInvoke} = GlobalProviders.getRegistrySettings(target); // FIXME should not be used
@@ -427,7 +429,11 @@ export class InjectorService extends Container {
       onInvoke(provider, locals, deps);
     }
 
-    const services = deps.map(dependency => this.invoke(dependency, locals, {parent: token}));
+    const services = [];
+    for (const dependency of deps) {
+      const service = await this.invoke(dependency, locals, {parent: token});
+      services.push(service);
+    }
 
     const instance = construct(services);
 

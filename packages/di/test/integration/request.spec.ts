@@ -1,9 +1,8 @@
-import {expect} from "chai";
 import * as Sinon from "sinon";
 import {GlobalProviders, InjectorService, OnDestroy, ProviderScope, Scope, Service} from "../../src";
 import {LocalsContainer} from "../../src/class/LocalsContainer";
 
-describe("DI", () => {
+describe("DI Request", () => {
   @Service()
   @Scope(ProviderScope.INSTANCE)
   class ServiceInstance {
@@ -37,34 +36,32 @@ describe("DI", () => {
     GlobalProviders.delete(ServiceInstance);
   });
 
-  describe("when REQUEST", () => {
-    describe("when invoke a service declared as REQUEST", () => {
-      it("should get a new instance of ServiceRequest", async () => {
-        // GIVEN
-        const injector = new InjectorService();
-        await injector.load();
+  describe("when invoke a service declared as REQUEST", () => {
+    it("should get a new instance of ServiceRequest", async () => {
+      // GIVEN
+      const injector = new InjectorService();
+      await injector.load();
 
-        // we use a local container to create a new context
-        const locals = new LocalsContainer();
+      // we use a local container to create a new context
+      const locals = new LocalsContainer();
 
-        // WHEN
-        const result1: any = injector.invoke(ServiceRequest, locals);
-        const result2: any = injector.invoke(ServiceRequest, locals);
-        const serviceSingleton1: any = injector.invoke(ServiceSingleton, locals);
-        const serviceSingleton2: any = injector.get(ServiceSingleton);
+      // WHEN
+      const result1: any = await injector.invoke(ServiceRequest, locals);
+      const result2: any = await injector.invoke(ServiceRequest, locals);
+      const serviceSingleton1: any = await injector.invoke(ServiceSingleton, locals);
+      const serviceSingleton2: any = injector.get(ServiceSingleton);
 
-        Sinon.stub(result1, "$onDestroy");
+      Sinon.stub(result1, "$onDestroy");
 
-        locals.destroy();
-        // THEN
-        result1.should.eq(result2);
-        result1.serviceSingleton.should.eq(serviceSingleton1);
-        result1.serviceInstance.should.instanceof(ServiceInstance);
+      locals.destroy();
+      // THEN
+      result1.should.eq(result2);
+      result1.serviceSingleton.should.eq(serviceSingleton1);
+      result1.serviceInstance.should.instanceof(ServiceInstance);
 
-        serviceSingleton1.should.eq(serviceSingleton2);
+      serviceSingleton1.should.eq(serviceSingleton2);
 
-        return result1.$onDestroy.should.have.been.called;
-      });
+      return result1.$onDestroy.should.have.been.called;
     });
   });
 });

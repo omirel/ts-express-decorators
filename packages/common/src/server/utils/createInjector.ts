@@ -12,8 +12,6 @@ export async function createInjector(settings: any): Promise<InjectorService> {
     [ProviderType.CONTROLLER]: settings.controllerScope
   };
 
-  console.log("===", injector.settings);
-
   return injector;
 }
 

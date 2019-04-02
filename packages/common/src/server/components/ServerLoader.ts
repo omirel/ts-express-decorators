@@ -168,7 +168,6 @@ export abstract class ServerLoader implements IServerLifecycle {
    * @deprecated
    */
   async init() {
-    console.log("===> ServerLoader.init()");
     const settings = ServerSettingsService.getMetadata(this);
 
     this._injector = await createInjector(settings);

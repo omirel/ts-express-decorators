@@ -2,7 +2,7 @@ import {Inject, Provider, ProviderScope, ProviderType} from "@tsed/common";
 import {Store} from "@tsed/core";
 import {expect} from "chai";
 import * as Sinon from "sinon";
-import {InjectorService, LocalsContainer} from "../../src";
+import {InjectorService} from "../../src";
 
 class Test {
   @Inject()
@@ -72,12 +72,12 @@ describe("InjectorService", () => {
     class Test {
     }
 
-    it("should return a provider", () => {
+    it("should return a provider", async () => {
       // GIVEN
       const injector = new InjectorService();
 
       // WHEN
-      const provider = injector.forkProvider(InjectorService);
+      const provider = await injector.forkProvider(InjectorService);
 
       // THEN
       provider.should.be.instanceof(Provider);
@@ -146,8 +146,8 @@ describe("InjectorService", () => {
 
         // WHEN
 
-        const result1 = injector.invoke(token, locals);
-        const result2 = injector.invoke(token, locals, {rebuild: true});
+        const result1 = await injector.invoke(token, locals);
+        const result2 = await injector.invoke(token, locals, {rebuild: true});
 
         // THEN
         result1.should.not.eq(result2);
@@ -182,8 +182,8 @@ describe("InjectorService", () => {
 
         // WHEN
 
-        const result1 = injector.invoke(token, locals);
-        const result2 = injector.invoke(token, locals);
+        const result1 = await injector.invoke(token, locals);
+        const result2 = await injector.invoke(token, locals);
 
         // THEN
         result1.should.eq(result2);
@@ -216,11 +216,11 @@ describe("InjectorService", () => {
         const locals2 = new Map(); // LocalContainer for the second request
 
         // WHEN REQ1
-        const result1 = injector.invoke(token, locals);
-        const result2 = injector.invoke(token, locals);
+        const result1 = await injector.invoke(token, locals);
+        const result2 = await injector.invoke(token, locals);
 
         // WHEN REQ2
-        const result3 = injector.invoke(token, locals2);
+        const result3 = await injector.invoke(token, locals2);
 
         // THEN
         result1.should.eq(result2);
@@ -255,8 +255,8 @@ describe("InjectorService", () => {
         const locals = new Map(); // LocalContainer for the first request
 
         // WHEN REQ1
-        const result1 = injector.invoke(token, locals);
-        const result2 = injector.invoke(token, locals);
+        const result1 = await injector.invoke(token, locals);
+        const result2 = await injector.invoke(token, locals);
 
         // THEN
         result1.should.not.eq(result2);
@@ -295,7 +295,7 @@ describe("InjectorService", () => {
         let actualError;
         let result;
         try {
-          result = injector.invoke(token, locals);
+          result = await injector.invoke(token, locals);
         } catch (er) {
           actualError = er;
         }
@@ -372,7 +372,7 @@ describe("InjectorService", () => {
       const instance = new Test();
 
       const spyTest2 = sandbox.spy(instance, "test2");
-      sandbox.spy(injector, "invoke");
+      sandbox.spy(injector, "get");
 
       // WHEN
       injector.bindMethod(instance, {bindingType: "method", propertyKey: "test2"} as any);
@@ -380,7 +380,7 @@ describe("InjectorService", () => {
 
       // THEN
       spyTest2.should.have.been.calledWithExactly(injector);
-      injector.invoke.should.have.been.calledWithExactly(InjectorService, Sinon.match.instanceOf(LocalsContainer), {parent: Test});
+      injector.get.should.have.been.calledWithExactly(InjectorService);
       expect(result).to.eq(injector);
     });
   });
@@ -447,7 +447,7 @@ describe("InjectorService", () => {
 
     after(() => sandbox.restore());
 
-    it("should bind the method", async  () => {
+    it("should bind the method", async () => {
       // GIVEN
       class InterceptorTest {
         aroundInvoke(ctx: any) {

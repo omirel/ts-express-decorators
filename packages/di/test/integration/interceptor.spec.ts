@@ -8,7 +8,7 @@ import {
   Service
 } from "../../src";
 
-describe("DI", () => {
+describe("DI Interceptor", () => {
   @Interceptor()
   class MyInterceptor implements IInterceptor {
     constructor(injSrv: InjectorService) {
@@ -36,43 +36,41 @@ describe("DI", () => {
     GlobalProviders.delete(ServiceTest);
   });
 
-  describe("Interceptor", () => {
-    it("should intercept the method", async () => {
-      // GIVEN
-      const injector = new InjectorService();
-      injector.addProvider(MyInterceptor);
-      injector.addProvider(ServiceTest);
+  it("should intercept the method", async () => {
+    // GIVEN
+    const injector = new InjectorService();
+    injector.addProvider(MyInterceptor);
+    injector.addProvider(ServiceTest);
 
-      await injector.load();
+    await injector.load();
 
-      const serviceTest = injector.invoke<ServiceTest>(ServiceTest)!;
+    const serviceTest = await injector.invoke<ServiceTest>(ServiceTest)!;
 
-      // WHEN
-      const result = serviceTest.exec("param data");
+    // WHEN
+    const result = serviceTest.exec("param data");
 
-      // THEN
-      result.should.deep.eq("Original data - param data - options data - intercepted");
-    });
+    // THEN
+    result.should.deep.eq("Original data - param data - options data - intercepted");
+  });
 
-    it("should intercept the method and throw error", async () => {
-      // GIVEN
-      const injector = new InjectorService();
-      injector.addProvider(MyInterceptor);
-      injector.addProvider(ServiceTest);
+  it("should intercept the method and throw error", async () => {
+    // GIVEN
+    const injector = new InjectorService();
+    injector.addProvider(MyInterceptor);
+    injector.addProvider(ServiceTest);
 
-      await injector.load();
+    await injector.load();
 
-      const serviceTest = injector.invoke<ServiceTest>(ServiceTest)!;
+    const serviceTest = await injector.invoke<ServiceTest>(ServiceTest)!;
 
-      // WHEN
-      let actualError;
-      try {
-        serviceTest.exec({} as any);
-      } catch (er) {
-        actualError = er;
-      }
-      // THEN
-      actualError.message.should.eq("Error message");
-    });
+    // WHEN
+    let actualError;
+    try {
+      serviceTest.exec({} as any);
+    } catch (er) {
+      actualError = er;
+    }
+    // THEN
+    actualError.message.should.eq("Error message");
   });
 });
